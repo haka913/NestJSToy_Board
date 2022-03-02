@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Board, BoardStatus } from './board.model';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { BoardStatusValidationPipe } from './pipes/board-status-validation.pipe';
 
 @Controller('boards')
 export class BoardsController {
@@ -12,7 +13,10 @@ export class BoardsController {
         return this.boardsService.getAllBoards();
     }
 
+    // Handler-level Pipes
+    // built-in pipe(validationPipe)
     @Post()
+    @UsePipes(ValidationPipe)
     createBoard(
         @Body() createBoardDto: CreateBoardDto
     ): Board {
@@ -32,7 +36,7 @@ export class BoardsController {
     @Patch('/:id/status')
     updateBoardStatus(
         @Param('id') id:string,
-        @Body('status') status: BoardStatus): Board{
+        @Body('status', BoardStatusValidationPipe) status: BoardStatus): Board{
         return this.boardsService.updateBoardStatus(id, status);
     }
 }
